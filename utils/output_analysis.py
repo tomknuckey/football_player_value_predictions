@@ -89,3 +89,14 @@ def plot_player_value_trends(
     )
 
     fig.show()
+
+def save_output_tables(pdf):
+
+    pdf_output_header = pdf[["model_output_id", "model_run_date", "time_taken_seconds", "features_used", "model_type", "split_year"]].drop_duplicates(subset=["model_output_id"])
+    pdf_output_detail = pdf[["player_id", "year", "age", "predicted_value", "name", "model_output_id"]]
+
+    # Append header-level output
+    pdf_output_header.to_csv("data/output/header_output.csv", mode="a", index=False, header=True)
+
+    # Append detailed player-level output
+    pdf_output_detail.to_csv("data/output/detail_output.csv", mode="a", index=False, header=True)
