@@ -23,3 +23,7 @@ Try different objective functions for example root means squared error
 Remove inflation then add at the end 
 
 Set seeds for random
+
+Try Optuna
+
+Try Random Forest
