@@ -27,3 +27,5 @@ Set seeds for random
 Try Optuna
 
 Try Random Forest
+
+Get shared things into function
