@@ -24,8 +24,8 @@ Remove inflation then add at the end
 
 Set seeds for random
 
-Try Optuna
-
 Try Random Forest
 
 Get shared things into function
+
+Create new metadata thing
