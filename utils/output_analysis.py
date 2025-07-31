@@ -5,6 +5,7 @@ import pandas as pd
 import plotly.express as px
 from typing import List
 import os
+import shap
 
 def plot_decision_tree_importance(regressor: XGBRegressor, features: List[str]) -> None:
     """
@@ -114,3 +115,21 @@ def save_output_tables(pdf):
 
     # Append detailed player-level output
     pdf_output_detail.to_csv(detail_path, mode="a", index=False, header=not detail_exists)
+
+def create_shapley_values_plots(
+    model: XGBRegressor,
+    X_train: pd.DataFrame,
+    features: List[str]
+) -> None:
+    """
+    Generate and display a SHAP summary plot for a trained XGBoost model.
+
+    Args:
+        model: A trained XGBRegressor model.
+        X_train: DataFrame containing the training features.
+        features: List of feature names used during training.
+    """
+    explainer = shap.TreeExplainer(model)
+    explanation = explainer(X_train)
+    shap_values = explanation.values
+    shap.summary_plot(shap_values, X_train, feature_names=features)
