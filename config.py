@@ -7,3 +7,5 @@ features = [
     "subpos",
     "contract_years_left",
 ]
+
+target = "market_value_in_million_eur"
