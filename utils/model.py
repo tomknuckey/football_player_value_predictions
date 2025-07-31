@@ -71,3 +71,29 @@ def analysis_result(
 
     fig = px.scatter(current_df, x="predicted_value", y=target, hover_data=["name", "age"])
     fig.show()
+
+def prepare_future_year_data(current_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Prepares a DataFrame for the next prediction year by selecting and renaming
+    necessary columns. Specifically:
+    - Keeps key static and encoded columns (e.g., position dummies).
+    - Renames 'age' to 'age_last_year'.
+
+    Args:
+        current_df (pd.DataFrame): The DataFrame containing player data and predictions.
+
+    Returns:
+        pd.DataFrame: A new DataFrame with selected columns and 'age' renamed.
+    """
+    pos_cols = [col for col in current_df.columns if col.startswith("pos_")]
+    subpos_cols = [col for col in current_df.columns if col.startswith("subpos_")]
+    static_cols = pos_cols + subpos_cols
+
+    carry_cols = ["player_id", "value_last_year", "age", *static_cols]
+    if "contract_years_left" in current_df.columns:
+        carry_cols.append("contract_years_left")
+
+    future_df = current_df[carry_cols].copy()
+    future_df.rename(columns={"age": "age_last_year"}, inplace=True)
+
+    return future_df
