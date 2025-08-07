@@ -1,14 +1,14 @@
 ## 
 
-Improve decision tree - hyperparameters?
+Improve decision tree - hyperparameters? - DONE
 
 Add features
 
-Create output framework 
+Create output framework - DONE
 
 Change so there's predictions that can be evaulated for more years - not just 2023
 
-Add Shapley Values
+Add Shapley Values - DONE
 
 Add a config
 

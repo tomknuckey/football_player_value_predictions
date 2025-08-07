@@ -87,7 +87,10 @@ def prepare_future_year_data(current_df: pd.DataFrame) -> pd.DataFrame:
     """
     pos_cols = [col for col in current_df.columns if col.startswith("pos_")]
     subpos_cols = [col for col in current_df.columns if col.startswith("subpos_")]
-    static_cols = pos_cols + subpos_cols
+    static_cols = pos_cols + subpos_cols + [    "team_ppg",
+    "team_goal_difference",
+    "team_goals_scored",
+    "team_goals_conceded"]
 
     carry_cols = ["player_id", "value_last_year", "age", *static_cols]
     if "contract_years_left" in current_df.columns:
