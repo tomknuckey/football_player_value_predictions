@@ -9,7 +9,15 @@ features = [
     "team_ppg",
     "team_goal_difference",
     "team_goals_scored",
-    "team_goals_conceded"
+    "team_goals_conceded",
+    "games_played",
+    "total_minutes",
+    "goals",
+    "assists",
+    "goal_contributions",
+    "goals_per_90",
+    "assists_per_90",
+    "contrib_per_90",
 ]
 
 target = "market_value_in_million_eur"

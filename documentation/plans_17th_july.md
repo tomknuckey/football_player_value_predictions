@@ -29,3 +29,9 @@ Try Random Forest
 Get shared things into function
 
 Create new metadata thing
+
+Feature Importance
+
+More plots in output framework
+
+Show examples of decision trees - run a basic decision tree model on it 
