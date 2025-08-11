@@ -3,9 +3,10 @@ from xgboost import XGBRegressor
 import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.express as px
-from typing import List
+from typing import List, Optional
 import os
 import shap
+
 
 def plot_decision_tree_importance(regressor: XGBRegressor, features: List[str]) -> None:
     """
@@ -37,12 +38,12 @@ def plot_decision_tree_importance(regressor: XGBRegressor, features: List[str]) 
     plt.tight_layout()
     plt.show()
 
-
-
 def plot_player_value_trends(
     train_df: pd.DataFrame,
     merged_df: pd.DataFrame,
-    player_ids: List[int],
+    player_ids: Optional[List[int]] = None,
+    top_year: Optional[int] = None,
+    top_n: Optional[int] = None,
     start_year: int = 2015,
     boundary_year: float = 2022.5,
     boundary_label: str = "2022/2023 boundary",
@@ -50,23 +51,39 @@ def plot_player_value_trends(
     """
     Plots predicted and historical market values over time for selected players.
 
+    Selection can be made in one of two ways:
+        1. Specify a list of `player_ids` directly.
+        2. Specify `top_year` and `top_n` to pick the top-N most valuable players from that year.
+
     Args:
-        train_df: Historical data containing actual market values with columns
+        train_df: Historical data containing actual market values with columns:
                   ["player_id", "year", "age", "market_value_in_million_eur", "name"].
         merged_df: Predicted data with similar columns but "predicted_value" instead of actual.
-        player_ids: List of player IDs to filter and plot.
-        start_year: Minimum year to include in the plot (default 2015).
-        boundary_year: Year at which to add a vertical boundary line (default 2022.5).
+        player_ids: List of player IDs to filter and plot. If provided, takes priority.
+        top_year: Year from which to select the top players (used if player_ids not provided).
+        top_n: Number of top players to plot (used if player_ids not provided).
+        start_year: Minimum year to include in the plot.
+        boundary_year: Year at which to add a vertical boundary line.
         boundary_label: Text label for the boundary line.
     """
-
-    # Prepare historical data, rename target column to match predicted values
+    # Prepare historical data with same column naming as predictions
     historical_df = train_df[["player_id", "year", "age", "market_value_in_million_eur", "name"]].rename(
         columns={"market_value_in_million_eur": "predicted_value"}
     )
 
     # Combine actual and predicted data
     combined_data = pd.concat([historical_df, merged_df], ignore_index=True)
+
+    # Determine player IDs to plot
+    if player_ids is None:
+        if top_year is None or top_n is None:
+            raise ValueError("Either `player_ids` or both `top_year` and `top_n` must be provided.")
+        player_ids = (
+            combined_data[combined_data["year"] == top_year]
+            .sort_values("predicted_value", ascending=False)
+            .head(top_n)["player_id"]
+            .tolist()
+        )
 
     # Filter for selected players and years
     filtered_data = combined_data.query("player_id in @player_ids and year >= @start_year")
@@ -81,7 +98,7 @@ def plot_player_value_trends(
         hover_data=["age"],
     )
 
-    # Add vertical boundary line to distinguish actual from predicted
+    # Add vertical boundary line
     fig.add_vline(
         x=boundary_year,
         line_dash="dash",
@@ -91,6 +108,7 @@ def plot_player_value_trends(
     )
 
     fig.show()
+
 
 
 def save_output_tables(pdf):
@@ -115,21 +133,3 @@ def save_output_tables(pdf):
 
     # Append detailed player-level output
     pdf_output_detail.to_csv(detail_path, mode="a", index=False, header=not detail_exists)
-
-def create_shapley_values_plots(
-    model: XGBRegressor,
-    X_train: pd.DataFrame,
-    features: List[str]
-) -> None:
-    """
-    Generate and display a SHAP summary plot for a trained XGBoost model.
-
-    Args:
-        model: A trained XGBRegressor model.
-        X_train: DataFrame containing the training features.
-        features: List of feature names used during training.
-    """
-    explainer = shap.TreeExplainer(model)
-    explanation = explainer(X_train)
-    shap_values = explanation.values
-    shap.summary_plot(shap_values, X_train, feature_names=features)

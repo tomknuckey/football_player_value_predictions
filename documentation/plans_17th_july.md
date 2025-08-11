@@ -10,6 +10,8 @@ Change so there's predictions that can be evaulated for more years - not just 20
 
 Add Shapley Values - DONE
 
+Individual Shapley Value plots
+
 Add a config
 
 Look at hierarchial time series forecasting 
@@ -35,3 +37,5 @@ Feature Importance
 More plots in output framework
 
 Show examples of decision trees - run a basic decision tree model on it 
+
+Seperate training and tuning 

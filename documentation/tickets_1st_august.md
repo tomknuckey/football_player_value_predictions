@@ -1,4 +1,6 @@
 
+### These are Finished
+
 1. Scope Features to Create
 
 An issue is that players ability isn't considered
