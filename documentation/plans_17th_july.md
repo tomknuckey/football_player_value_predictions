@@ -38,4 +38,12 @@ More plots in output framework
 
 Show examples of decision trees - run a basic decision tree model on it 
 
-Seperate training and tuning 
+Seperate training and tuning
+
+Take age out of it then do manual adjustments afterwards. 
+
+Add artificial data for older players
+
+Create table like output header / output detail that means we can plot feature importance
+
+Adapt the 0.75 scaling for retired players by position
