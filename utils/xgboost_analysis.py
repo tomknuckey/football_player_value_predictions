@@ -62,6 +62,8 @@ def plot_feature_importance(model, features: List[str], top_n: int = 20) -> None
     plt.gca().invert_yaxis()
     plt.show()
 
+    return importances.sort_values(ascending=False)
+
 
 
 def create_shapley_values_plots(

@@ -21,3 +21,5 @@ features = [
 ]
 
 target = "market_value_in_million_eur"
+
+filter_out_synthetic = False # True if we only want real data

@@ -47,3 +47,9 @@ Add artificial data for older players
 Create table like output header / output detail that means we can plot feature importance
 
 Adapt the 0.75 scaling for retired players by position
+
+Plots for feature importance change over time
+
+Save the last few versions of the output folder / set save guards 
+
+Create helper function for removing model_output_ids 
