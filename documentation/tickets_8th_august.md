@@ -25,3 +25,5 @@ BEFORE IN MODEL CREATE ANALYSIS TABLE FOR FEATURE IMPORTANCE
 
 Firstly consider how this behaves 
 
+Adding synthetic data write up
+
