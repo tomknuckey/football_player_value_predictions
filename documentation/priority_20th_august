@@ -1,0 +1,20 @@
+The stakeholder wants a POC to test.
+
+There should be a stable, documented model in a good output format.
+There should be a write up on how it works and what could be improved.
+
+Also there should be high level priorities on what to prioritise next
+
+### Steps
+
+* Determine version to use and document
+* Small Refactor / documentation
+* Create Streamlit 
+    * Consider visual requirements
+    * Consider heavy lifting to be done in the backend
+    * Write up on how to use it
+* Sense check on Streamlit results
+* Plan next steps
+* Business focused documentation on the results
+
+

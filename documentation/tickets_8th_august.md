@@ -27,3 +27,5 @@ Firstly consider how this behaves
 
 Adding synthetic data write up
 
+Do post processing 
+

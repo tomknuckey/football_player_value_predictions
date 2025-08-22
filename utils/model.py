@@ -108,3 +108,60 @@ def prepare_future_year_data(current_df: pd.DataFrame) -> pd.DataFrame:
     future_df.rename(columns={"age": "age_last_year"}, inplace=True)
 
     return future_df
+
+def iterative_cap_predicted_value(
+    df: pd.DataFrame,
+    age_limit: int = 32,
+    scale_limit: float = 0.8
+) -> pd.DataFrame:
+    """
+    Iteratively cap predicted_value for ages >= age_limit so that each year's value
+    cannot exceed scale_limit * previous year's value, compounding year-on-year.
+    Also adds a 'was_capped' column indicating if the row's value was capped.
+
+    Args:
+        df (pd.DataFrame): DataFrame with columns ['player_id', 'year', 'age', 'predicted_value', ...]
+        age_limit (int): Age threshold (inclusive)
+        scale_limit (float): Maximum allowed ratio of predicted_value to previous year's value
+
+    Returns:
+        pd.DataFrame: DataFrame with capped predicted_value and was_capped column,
+                      preserving the original row order.
+    """
+    # Keep track of original order
+    df = df.copy()
+    df["_original_order"] = range(len(df))
+
+    # Work on sorted version
+    sorted_df = df.sort_values(["player_id", "year"])
+    capped_values = []
+
+    for player_id, group in sorted_df.groupby("player_id"):
+        group = group.sort_values("year").copy()
+        for idx, row in group.iterrows():
+            was_capped = False
+            if row["age"] >= age_limit:
+                prev_idx = group.index.get_loc(idx) - 1
+                if prev_idx >= 0:
+                    prev_row = group.iloc[prev_idx]
+                    prev_value = (
+                        capped_values[-1]["predicted_value"]
+                        if capped_values and capped_values[-1]["player_id"] == player_id
+                        else prev_row["predicted_value"]
+                    )
+                    capped_value = min(row["predicted_value"], scale_limit * prev_value)
+                    if capped_value < row["predicted_value"]:
+                        was_capped = True
+                    row["predicted_value"] = capped_value
+            row["was_capped"] = was_capped
+            capped_values.append(row)
+
+    # Rebuild dataframe
+    capped_df = pd.DataFrame(capped_values)
+
+    # Restore original order
+    capped_df = capped_df.sort_values("_original_order").drop(columns="_original_order").reset_index(drop=True)
+
+    return capped_df
+
+
