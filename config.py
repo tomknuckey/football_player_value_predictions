@@ -23,3 +23,7 @@ features = [
 target = "market_value_in_million_eur"
 
 filter_out_synthetic = False # True if we only want real data
+
+filter_out_fake_players = True # True if we want to filter out hardcoded synthetic players
+
+zero_cap = True

@@ -11,10 +11,13 @@ Also there should be high level priorities on what to prioritise next
 * Small Refactor / documentation
 * Create Streamlit 
     * Consider visual requirements
-    * Consider heavy lifting to be done in the backend
+    * Consider heavy lifting to be done before
     * Write up on how to use it
 * Sense check on Streamlit results
 * Plan next steps
+    * Automation
 * Business focused documentation on the results
+* Create readme 
+* Consider analytical questions that might be asked
 
 

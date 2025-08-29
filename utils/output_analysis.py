@@ -41,30 +41,32 @@ def plot_decision_tree_importance(regressor: XGBRegressor, features: List[str]) 
 def plot_player_value_trends(
     train_df: pd.DataFrame,
     merged_df: pd.DataFrame,
-    player_ids: Optional[List[int]] = None,
+    player_ids: Optional[List[Union[int, str]]] = None,
     top_year: Optional[int] = None,
     top_n: Optional[int] = None,
     start_year: int = 2015,
     boundary_year: float = 2022.5,
     boundary_label: str = "2022/2023 boundary",
-) -> None:
+    use_names: bool = False,
+):
     """
     Plots predicted and historical market values over time for selected players.
 
     Selection can be made in one of two ways:
-        1. Specify a list of `player_ids` directly.
+        1. Specify a list of `player_ids` (IDs or names depending on `use_names`).
         2. Specify `top_year` and `top_n` to pick the top-N most valuable players from that year.
 
     Args:
         train_df: Historical data containing actual market values with columns:
                   ["player_id", "year", "age", "market_value_in_million_eur", "name"].
         merged_df: Predicted data with similar columns but "predicted_value" instead of actual.
-        player_ids: List of player IDs to filter and plot. If provided, takes priority.
+        player_ids: List of player IDs or names (depending on `use_names`) to filter and plot.
         top_year: Year from which to select the top players (used if player_ids not provided).
         top_n: Number of top players to plot (used if player_ids not provided).
         start_year: Minimum year to include in the plot.
         boundary_year: Year at which to add a vertical boundary line.
         boundary_label: Text label for the boundary line.
+        use_names: If True, interpret `player_ids` as player names instead of IDs.
     """
     # Prepare historical data with same column naming as predictions
     historical_df = train_df[["player_id", "year", "age", "market_value_in_million_eur", "name"]].rename(
@@ -74,19 +76,31 @@ def plot_player_value_trends(
     # Combine actual and predicted data
     combined_data = pd.concat([historical_df, merged_df], ignore_index=True)
 
-    # Determine player IDs to plot
+    # Determine players to plot
     if player_ids is None:
         if top_year is None or top_n is None:
             raise ValueError("Either `player_ids` or both `top_year` and `top_n` must be provided.")
-        player_ids = (
-            combined_data[combined_data["year"] == top_year]
-            .sort_values("predicted_value", ascending=False)
-            .head(top_n)["player_id"]
-            .tolist()
-        )
+        sort_column = "predicted_value"
+        if use_names:
+            player_ids = (
+                combined_data[combined_data["year"] == top_year]
+                .sort_values(sort_column, ascending=False)
+                .head(top_n)["name"]
+                .tolist()
+            )
+        else:
+            player_ids = (
+                combined_data[combined_data["year"] == top_year]
+                .sort_values(sort_column, ascending=False)
+                .head(top_n)["player_id"]
+                .tolist()
+            )
 
-    # Filter for selected players and years
-    filtered_data = combined_data.query("player_id in @player_ids and year >= @start_year")
+    # Filtering logic (switch based on use_names)
+    if use_names:
+        filtered_data = combined_data.query("name in @player_ids and year >= @start_year")
+    else:
+        filtered_data = combined_data.query("player_id in @player_ids and year >= @start_year")
 
     # Create line plot
     fig = px.line(
@@ -107,7 +121,8 @@ def plot_player_value_trends(
         annotation_position="top right",
     )
 
-    fig.show()
+    return fig
+
 
 
 

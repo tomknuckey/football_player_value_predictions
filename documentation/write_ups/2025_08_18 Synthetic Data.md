@@ -26,3 +26,5 @@ Especially when ("year <2023") it's 4.5
 Synethic data was added which was hard coded which improved this in some ways for example Salah but not for Haaland.
 
 More was added, to take it to 18 records but this didn't improve it particularly
+
+In the end version 0.0.8 was adding a manual cap for players over 32.

@@ -3,3 +3,6 @@ plotly.express
 numpy
 optuna
 shap
+streamlit
+xgboost
+matplotlib
