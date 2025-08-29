@@ -3,7 +3,7 @@ from xgboost import XGBRegressor
 import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.express as px
-from typing import List, Optional
+from typing import List, Optional, Union
 import os
 import shap
 
@@ -38,81 +38,58 @@ def plot_decision_tree_importance(regressor: XGBRegressor, features: List[str]) 
     plt.tight_layout()
     plt.show()
 
-def plot_player_value_trends(
-    train_df: pd.DataFrame,
-    merged_df: pd.DataFrame,
-    player_ids: Optional[List[Union[int, str]]] = None,
-    top_year: Optional[int] = None,
-    top_n: Optional[int] = None,
-    start_year: int = 2015,
-    boundary_year: float = 2022.5,
-    boundary_label: str = "2022/2023 boundary",
-    use_names: bool = False,
-):
-    """
-    Plots predicted and historical market values over time for selected players.
+def _prepare_combined_data(train_df: pd.DataFrame, merged_df: pd.DataFrame) -> pd.DataFrame:
+    """Combine historical and predicted data, ensuring `current_club_name` exists if possible."""
+    base_cols = ["player_id", "year", "age", "market_value_in_million_eur", "name"]
+    if "current_club_name" in train_df.columns:
+        base_cols.append("current_club_name")
 
-    Selection can be made in one of two ways:
-        1. Specify a list of `player_ids` (IDs or names depending on `use_names`).
-        2. Specify `top_year` and `top_n` to pick the top-N most valuable players from that year.
-
-    Args:
-        train_df: Historical data containing actual market values with columns:
-                  ["player_id", "year", "age", "market_value_in_million_eur", "name"].
-        merged_df: Predicted data with similar columns but "predicted_value" instead of actual.
-        player_ids: List of player IDs or names (depending on `use_names`) to filter and plot.
-        top_year: Year from which to select the top players (used if player_ids not provided).
-        top_n: Number of top players to plot (used if player_ids not provided).
-        start_year: Minimum year to include in the plot.
-        boundary_year: Year at which to add a vertical boundary line.
-        boundary_label: Text label for the boundary line.
-        use_names: If True, interpret `player_ids` as player names instead of IDs.
-    """
-    # Prepare historical data with same column naming as predictions
-    historical_df = train_df[["player_id", "year", "age", "market_value_in_million_eur", "name"]].rename(
+    historical_df = train_df[base_cols].rename(
         columns={"market_value_in_million_eur": "predicted_value"}
     )
 
-    # Combine actual and predicted data
-    combined_data = pd.concat([historical_df, merged_df], ignore_index=True)
-
-    # Determine players to plot
-    if player_ids is None:
-        if top_year is None or top_n is None:
-            raise ValueError("Either `player_ids` or both `top_year` and `top_n` must be provided.")
-        sort_column = "predicted_value"
-        if use_names:
-            player_ids = (
-                combined_data[combined_data["year"] == top_year]
-                .sort_values(sort_column, ascending=False)
-                .head(top_n)["name"]
-                .tolist()
-            )
-        else:
-            player_ids = (
-                combined_data[combined_data["year"] == top_year]
-                .sort_values(sort_column, ascending=False)
-                .head(top_n)["player_id"]
-                .tolist()
-            )
-
-    # Filtering logic (switch based on use_names)
+    combined = pd.concat([historical_df, merged_df], ignore_index=True)
+    return combined
+def _filter_players(combined: pd.DataFrame, player_ids: List[Union[int, str]], start_year: int, use_names: bool):
+    """Filter by player IDs or names."""
     if use_names:
-        filtered_data = combined_data.query("name in @player_ids and year >= @start_year")
-    else:
-        filtered_data = combined_data.query("player_id in @player_ids and year >= @start_year")
+        return combined.query("name in @player_ids and year >= @start_year")
+    return combined.query("player_id in @player_ids and year >= @start_year")
 
-    # Create line plot
+
+def _filter_teams(combined: pd.DataFrame, teams: List[str], start_year: int):
+    """Filter by teams if `current_club_name` exists."""
+    if "current_club_name" not in combined.columns:
+        return combined.query("year >= @start_year")
+    return combined.query("current_club_name in @teams and year >= @start_year")
+
+
+def _filter_top_n(combined: pd.DataFrame, top_year: int, top_n: int, start_year: int, use_names: bool):
+    """Select top-N players by predicted value in a given year."""
+    top_players = (
+        combined[combined["year"] == top_year]
+        .sort_values("predicted_value", ascending=False)
+        .head(top_n)
+    )
+    player_ids = top_players["name"].tolist() if use_names else top_players["player_id"].tolist()
+    return _filter_players(combined, player_ids, start_year, use_names)
+
+
+def _plot_line(filtered_data: pd.DataFrame, boundary_year: float, boundary_label: str):
+    """Create the Plotly line chart."""
+    hover_cols = ["age"]
+    if "current_club_name" in filtered_data.columns:
+        hover_cols.append("current_club_name")
+
     fig = px.line(
         filtered_data,
         x="year",
         y="predicted_value",
         color="name",
         title="Predicted Market Values for Selected Players",
-        hover_data=["age"],
+        hover_data=hover_cols,
     )
 
-    # Add vertical boundary line
     fig.add_vline(
         x=boundary_year,
         line_dash="dash",
@@ -120,9 +97,35 @@ def plot_player_value_trends(
         annotation_text=boundary_label,
         annotation_position="top right",
     )
-
     return fig
 
+
+def plot_player_value_trends(
+    train_df: pd.DataFrame,
+    merged_df: pd.DataFrame,
+    player_ids: Optional[List[Union[int, str]]] = None,
+    teams: Optional[List[str]] = None,
+    top_year: Optional[int] = None,
+    top_n: Optional[int] = None,
+    start_year: int = 2015,
+    boundary_year: float = 2022.5,
+    boundary_label: str = "2022/2023 boundary",
+    use_names: bool = False,
+):
+    """Main function to plot player market values using different filtering options."""
+    
+    combined_data = _prepare_combined_data(train_df, merged_df)
+
+    if player_ids is not None:
+        filtered_data = _filter_players(combined_data, player_ids, start_year, use_names)
+    elif teams is not None:
+        filtered_data = _filter_teams(combined_data, teams, start_year)
+    elif top_year is not None and top_n is not None:
+        filtered_data = _filter_top_n(combined_data, top_year, top_n, start_year, use_names)
+    else:
+        raise ValueError("You must provide either player_ids, teams, or top_year/top_n.")
+
+    return _plot_line(filtered_data, boundary_year, boundary_label)
 
 
 

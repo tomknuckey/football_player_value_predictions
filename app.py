@@ -38,7 +38,7 @@ st.plotly_chart(fig, use_container_width=True)
 
 pdf_mvp = pd.read_csv("data/intermediate/time_series_model_data_prep.csv") 
 
-
+pdf_clubs = pd.read_csv("data/intermediate/time_series_model_data_prep.csv").sort_values(by=["player_id", "year"]).groupby("player_id").tail(1)[["player_id", "current_club_name"]].reset_index(drop=True)
 features = define_features(pdf_mvp, features)
 
 pdf_train, pdf_test = test_train_split(pdf_mvp, test_start)
@@ -79,6 +79,8 @@ selected_players = st.multiselect(
     default=["Declan Rice"]  # pick any default(s) you like
 )
 
+pdf_output_timeframe = pdf_output_timeframe.merge(pdf_clubs, on="player_id", how="left")
+
 # Only plot if at least one player is selected
 if selected_players:
     fig_players = plot_player_value_trends(
@@ -90,3 +92,24 @@ if selected_players:
     st.plotly_chart(fig_players, use_container_width=True)
 else:
     st.info("Please select at least one player to display trends.")
+
+
+# Get all unique teams that exist in both dataframes
+teams = list(pdf_mvp["current_club_name"].unique())
+
+# Streamlit multiselect for teams
+selected_teams = st.multiselect(
+    "Select teams to view player value trends:",
+    options=teams,
+)
+
+# Only plot if at least one team is selected
+if selected_teams:
+    fig = plot_player_value_trends(
+        pdf_train,
+        pdf_output_timeframe,
+        teams=selected_teams
+    )
+    st.plotly_chart(fig, use_container_width=True)
+else:
+    st.info("Please select at least one team to display trends.")
