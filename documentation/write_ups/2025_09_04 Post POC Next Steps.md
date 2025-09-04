@@ -21,13 +21,13 @@ There are many areas for improvement before this can be considered production-re
    - Consider removing age from the model and applying manual adjustments post-prediction.
 
 4. **Explore Other Algorithms**
-   - Try ensemble methods such as Random Forest.
+   - Try other models such as LGBM and Random Forest - alternatively models can be used in an ensemble.
 
 5. **Account for Inflation**
    - Remove inflation effects during modeling, then add them back in at the end.
 
 6. **Feature Engineering**
-   - Add new features, such as injury record.
+   - Add new features, such as injury record and national games.
 
 7. **Expand Dataset**
    - Run the model on all players, not just those in the Premier League.
@@ -51,6 +51,7 @@ There are many areas for improvement before this can be considered production-re
 - Save models as pickles to avoid retraining on each run.
 - Refactor code for more shared functions and modularity.
 - Move more configuration into a config file, and track with tools like MLflow.
+- Updating more code to .py files
 
 ---
 
