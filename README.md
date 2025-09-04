@@ -1,7 +1,8 @@
 # Football Value Predictor
 
 This uses varies Machine Learning models to predict player values over time, where we use XG Boost.
-The outputs are displayed on a streamlit app.  
+The outputs are displayed on a streamlit app.
+
 
 ## Data
 
@@ -13,9 +14,9 @@ The input data is from https://www.kaggle.com/datasets/davidcariboo/player-score
 The Streamlit dashboard provides an interactive way to explore and visualize player value predictions from the models in this project.
 
 This currently takes results from version 0.0.10 as defined here 
-documentation\write_ups\2025_08_22 POC Version.md
 
-Forecast ID = '9172dbf0-e716-4d4b-b097-239cbe425fca'
+[2025_08_22 POC Version](2025_08_22%20POC%20Version.md).
+
 
 ### 1. **Install Requirements**
 
@@ -63,27 +64,3 @@ streamlit run app.py
 
 - If you see missing data or errors, ensure all required CSV files are up to date and in the correct locations.
 - For further customization, edit the plotting and data loading logic in `app.py` and `utils/output_analysis.py`.
-
-
-## Models
-
-### Decision Tree Traditional 
-This does a test train split and predicts 
-
-### Decision Tree Forecasting
-
-This splits the data into test and train based off year.
-A decision tree is modelled based off the players value within the last two years of the training set.
-Other features are included.
-This decision tree is then applied using the training data to predict the first year of the test data.
-This is then applied iteratively to predict players value over time.
-
-
-
-### Regression
-
-This splits the data into test and train based off year.
-A regression is modelled based off the players value within the last two years of the training set.
-Other features are included.
-This model is then applied using the training data to predict the first year of the test data.
-This is then applied iteratively to predict players value over time.

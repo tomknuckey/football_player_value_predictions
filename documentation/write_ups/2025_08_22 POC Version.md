@@ -1,12 +1,27 @@
-We'll be using XG Boost Version - 0.0.10
+# XGBoost Model POC — Version 0.0.10
 
-* **Hyper Parameter Selection:** Optuna  
-* **Synthetic Data:** True  
-* **Fake Players:** False  
-* **Artificial Age Value Cap:** True (80% of last year's value for players ≥ 32)  
-* **Min Cap at 0:** True  
+**Forecast ID:** `9172dbf0-e716-4d4b-b097-239cbe425fca`
 
-**Features:**
+---
+
+## Overview
+
+This version uses XGBoost to predict player market values for the next year, with predictions extrapolated for future years. Several enhancements and constraints have been applied to improve realism and robustness.
+
+---
+
+## Configuration
+
+- **Hyperparameter Selection:** Optuna  
+- **Synthetic Data for Retired Players:** Enabled  
+- **Fake Players:** Disabled  
+- **Artificial Age Value Cap:** Enabled (80% of last year's value for players ≥ 32)  
+- **Minimum Cap at 0:** Enabled  
+
+---
+
+## Features Used
+
 - value_last_year
 - age_last_year
 - pos
@@ -25,24 +40,29 @@ We'll be using XG Boost Version - 0.0.10
 - assists_per_90
 - contrib_per_90
 
-Currently the model just makes logic for the next year, which is then extrapolated.
-
-RMSE / R squared is for that 1st year, so ensuring sensible results in the long term is more important than 1% of R squared for
+---
 
 ## Model Metrics
 
 ### Feature Importance
 
-![alt text](image-2.png)
+![Feature Importance](image-2.png)
+
+- **value_last_year** is by far the most important feature (importance: 0.5), with higher values strongly increasing the predicted output.
+- **goal_contributions**, **team_ppg**, **contract_years_left**, and **total_minutes** have moderate positive impacts.
+- **age_last_year** has a small impact, as artificial constraints are used to prevent unrealistically high values at advanced ages.
+- The model's focus on single-year changes may limit its ability to capture large value shifts.
+
+---
 
 ### Shapley Values
 
-![alt text](image-3.png)
+![Shapley Values](image-3.png)
 
-We can see that the value last year is the most important feature by a long way, where it has an importance of 0.5, where when it's large it has a positive impact on the model output.
+---
 
-Columns such as goal_contributions, team_ppg, contract_years_left and total_minutes have moderate impact, where the larger they are the more likely they are to have high model outputs.
+## Notes
 
-age_last_year has a small impact, where there have been artificial changes in order to stop players still having high value at very high ages.
-
-Potentially the fact the model only looks at one year causes issues with this where you don't often have big changes in one year.
+- The model only predicts one year ahead at a time, then extrapolates for future years.
+- RMSE and R² are calculated for the first forecasted year.
+- Ensuring sensible long-term value trajectories is prioritized over marginal improvements in short-term
