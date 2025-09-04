@@ -1,30 +1,31 @@
-In football players real life value predictions we'd expect them to decrease over time where when you're 40 you should be close to 0.
+# Improving Late-Career Value Predictions with Synthetic Data
 
-What has actually be seen in versions up to 0.0.5 was values to platou.
+## The Problem: Unrealistic Value Plateaus
 
-This was because when players retired the were removed from the data.
+In real-life football, we expect player market values to decrease significantly with age—by the time a player is 40, their value should be close to zero.
 
-Synthetic data was added for version 0.0.6
+However, in versions up to **0.0.5**, we observed that predicted values tended to plateau rather than decline. This issue arose because retired players were removed from the dataset, so the model never learned the natural decline that occurs late in a player's career.
 
-This had improved results, but for the high value players it didn't
+## Introducing Synthetic Data (v0.0.6)
+
+To address this, **synthetic data** was introduced in version **0.0.6**. This addition improved results for most players, but high-value players like Salah and Haaland were still not well modeled. The synthetic data did not include enough high-value examples—the highest value in the synthetic set was only **22.5M**, which limited the model's ability to learn appropriate decline patterns for top players. For context, before 2023, the highest synthetic value was just **4.5M**.
 
 ![alt text](image.png)
 
-For all apart from the high value players like Salah and people Haaland it worked well.
+## Limitations for Elite Players
 
-The sythentic data caused improvements, but not complete ones
-
-There aren't high value players in the synthetic data.
-
-The highest value was 22.5M - this means the model won't learn the lessons.
-
-Especially when ("year <2023") it's 4.5 
+While the synthetic data helped for most players, it was not sufficient for the elite group. Additional synthetic records were added, bringing the total to 18, but this still did not fully resolve the issue.
 
 ![alt text](image-1.png)
 
+## Manual Capping (v0.0.8)
 
-Synethic data was added which was hard coded which improved this in some ways for example Salah but not for Haaland.
+Ultimately, in version **0.0.8**, a manual cap was introduced for players over the age of 32 to enforce a more realistic decline in value.
 
-More was added, to take it to 18 records but this didn't improve it particularly
+## Summary and Next Steps
 
-In the end version 0.0.8 was adding a manual cap for players over 32.
+- **Synthetic data** is effective for modeling typical player value decline, but not enough for elite/high-value players unless the synthetic set covers their value range.
+- **Manual capping** provides a practical solution for enforcing realistic late-career value drops, but is a workaround rather than a true model improvement.
+- **Future improvements** could include generating more representative synthetic data for top players, or exploring models that explicitly account for career stage and retirement probability.
+
+This iterative process highlights the importance of both data coverage and domain knowledge in building robust predictive models for football player valuations.
