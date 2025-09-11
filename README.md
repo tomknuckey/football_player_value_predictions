@@ -49,8 +49,23 @@ streamlit run app.py
 - **Predicted vs Actual Scatter Plot:**  
   The app displays a scatter plot comparing predicted and actual player values for the selected model run.
 
+  ![alt text](image.png)
+
 - **Top-N Player Value Trends:**  
   Use the sidebar or controls to select the year (`top_year`) and the number of top players (`top_n`) you want to visualize. The app will plot the predicted value trajectories for the top-N players in the selected year.
+
+
+  ![alt text](image-1.png)
+
+- **Selected Player Value Trends:**  
+  You can select the players of your choice, plot the predicted value trajectories
+
+  ![alt text](image-2.png)
+
+- **Selected Team Value Trends:**  
+  You can select the team / teams of your choice and plot the predicted value trajectories of the players
+
+  ![alt text](image-3.png)
 
 - **Filtering Options:**  
   The app supports filtering out synthetic or fake players if configured in `config.py`.
@@ -59,6 +74,8 @@ streamlit run app.py
 
 - You can change the model run by editing the `model_id` variable in `app.py`.
 - Adjust the features and filtering logic in `config.py` as needed.
+
+
 
 ### 6. **Troubleshooting**
 
