@@ -4,3 +4,4 @@ __pycache__/
 backup/
 helper_funcs/
 documentation/plans/
+logs.log

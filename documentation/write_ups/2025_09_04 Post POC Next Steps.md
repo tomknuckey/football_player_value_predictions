@@ -22,6 +22,13 @@ There are many areas for improvement before this can be considered production-re
 
 4. **Explore Other Algorithms**
    - Try other models such as LGBM and Random Forest - alternatively models can be used in an ensemble.
+   Within model_selection.ipynb AutoML was done by using the lazypredict package to determine promising models.
+
+   ![ ](image-4.png)
+
+   Models such as MLPRegressor look promising
+
+   Deep learning has also been experimented with which was unsuccesful, which could be looked at more in future. 
 
 5. **Account for Inflation**
    - Remove inflation effects during modeling, then add them back in at the end.
